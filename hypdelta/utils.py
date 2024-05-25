@@ -31,7 +31,7 @@ def batch_flatten(indices, dist_matrix_flat):
 
 
 @njit(parallel=True)
-def prepare_batch_indices_flat(far_away_pairs, start_ind, end_ind, shape):
+def prepare_batch_indices_flat(far_away_pairs, start_ind, end_ind, n):
     batch_indices = np.empty(int(end_ind - start_ind) * 6, dtype=np.int32)
 
     for indx in prange(start_ind, end_ind):
@@ -40,12 +40,12 @@ def prepare_batch_indices_flat(far_away_pairs, start_ind, end_ind, shape):
         pair_1 = far_away_pairs[i]
         pair_2 = far_away_pairs[j]
 
-        batch_indices[6 * (indx - start_ind) + 0] = pair_1[0] * shape[0] + pair_1[1]
-        batch_indices[6 * (indx - start_ind) + 1] = pair_2[0] * shape[0] + pair_2[1]
-        batch_indices[6 * (indx - start_ind) + 2] = pair_1[0] * shape[0] + pair_2[0]
-        batch_indices[6 * (indx - start_ind) + 3] = pair_1[1] * shape[0] + pair_2[1]
-        batch_indices[6 * (indx - start_ind) + 4] = pair_1[0] * shape[0] + pair_2[1]
-        batch_indices[6 * (indx - start_ind) + 5] = pair_1[1] * shape[0] + pair_2[0]
+        batch_indices[6 * (indx - start_ind) + 0] = pair_1[0] * n + pair_1[1]
+        batch_indices[6 * (indx - start_ind) + 1] = pair_2[0] * n + pair_2[1]
+        batch_indices[6 * (indx - start_ind) + 2] = pair_1[0] * n + pair_2[0]
+        batch_indices[6 * (indx - start_ind) + 3] = pair_1[1] * n + pair_2[1]
+        batch_indices[6 * (indx - start_ind) + 4] = pair_1[0] * n + pair_2[0]
+        batch_indices[6 * (indx - start_ind) + 5] = pair_1[1] * n + pair_2[1]
     return batch_indices
 
 
