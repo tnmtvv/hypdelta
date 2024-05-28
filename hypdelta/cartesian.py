@@ -1,11 +1,58 @@
 import numpy as np
 from numba import cuda
 
-from hypdelta.utils import get_far_away_pairs, prepare_batch_indices_flat, batch_flatten
-from hypdelta.cudaprep import cuda_prep_CCL, cuda_prep_cartesian
+from hypdelta.calculus_utils import (
+    get_far_away_pairs,
+    prepare_batch_indices_flat,
+    batch_flatten,
+)
+from hypdelta.cudaprep import cuda_prep_cartesian
 
 
-def delta_cartesian_way_new(dist_matrix, batch_size, l, all_threads):
+@cuda.jit
+def gpu_cartesian(dist_array, delta_res):
+    """
+    Computes the delta hyperbolicity for a given array of distance values using Cartesian coordinates.
+
+    This function is designed to run on a GPU using CUDA. It calculates the delta hyperbolicity value
+    for each row in the distance array and updates the result atomically.
+
+    Parameters:
+    -----------
+    dist_array : np.ndarray
+        A 2D array where each row contains six distance values corresponding to the distances
+        between pairs of points in the Cartesian space.
+    delta_res : np.ndarray
+        A single-element array to store the maximum delta hyperbolicity value computed. This array
+        is updated atomically to ensure thread safety.
+
+    Notes:
+    ------
+    - The function uses CUDA for parallel computation, so it must be run in an environment with a
+      compatible GPU and the necessary CUDA setup.
+    - The distance array should be prepared such that each row contains exactly six values.
+    - The delta hyperbolicity value is computed as:
+      (d(A,B) + d(C,D) - max(d(A,C) + d(B,D), d(A,D) + d(B,C))) / 2
+    - This function should be launched as a CUDA kernel with an appropriate number of threads and blocks.
+    """
+
+    row = cuda.grid(1)
+    cuda.atomic.max(
+        delta_res,
+        (0),
+        (
+            dist_array[row][0]
+            + dist_array[row][1]
+            - max(
+                dist_array[row][2] + dist_array[row][3],
+                dist_array[row][4] + dist_array[row][5],
+            )
+        )
+        / 2,
+    )
+
+
+def delta_cartesian(dist_matrix, batch_size, l, all_threads):
     """
     Computes the delta hyperbolicity of a given distance matrix using a Cartesian approach.
 
@@ -61,54 +108,9 @@ def delta_cartesian_way_new(dist_matrix, batch_size, l, all_threads):
             threadsperblock,
             blockspergrid,
         ) = cuda_prep_cartesian(batch, all_threads)
-        delta_CCL_cartesian[blockspergrid, threadsperblock](
-            cartesian_dist_array, delta_res
-        )
+        gpu_cartesian[blockspergrid, threadsperblock](cartesian_dist_array, delta_res)
         deltas[i] = 2 * delta_res[0] / diam
         del cartesian_dist_array
         del batch
     delta = max(deltas)
     return delta, diam
-
-
-@cuda.jit
-def delta_CCL_cartesian(dist_array, delta_res):
-    """
-    Computes the delta hyperbolicity for a given array of distance values using Cartesian coordinates.
-
-    This function is designed to run on a GPU using CUDA. It calculates the delta hyperbolicity value
-    for each row in the distance array and updates the result atomically.
-
-    Parameters:
-    -----------
-    dist_array : np.ndarray
-        A 2D array where each row contains six distance values corresponding to the distances
-        between pairs of points in the Cartesian space.
-    delta_res : np.ndarray
-        A single-element array to store the maximum delta hyperbolicity value computed. This array
-        is updated atomically to ensure thread safety.
-
-    Notes:
-    ------
-    - The function uses CUDA for parallel computation, so it must be run in an environment with a
-      compatible GPU and the necessary CUDA setup.
-    - The distance array should be prepared such that each row contains exactly six values.
-    - The delta hyperbolicity value is computed as:
-      (d(A,B) + d(C,D) - max(d(A,C) + d(B,D), d(A,D) + d(B,C))) / 2
-    - This function should be launched as a CUDA kernel with an appropriate number of threads and blocks.
-    """
-
-    row = cuda.grid(1)
-    cuda.atomic.max(
-        delta_res,
-        (0),
-        (
-            dist_array[row][0]
-            + dist_array[row][1]
-            - max(
-                dist_array[row][2] + dist_array[row][3],
-                dist_array[row][4] + dist_array[row][5],
-            )
-        )
-        / 2,
-    )

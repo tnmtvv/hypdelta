@@ -1,20 +1,11 @@
 import numpy as np
 from numba import njit, prange
 
-from hypdelta.utils import s_delta
-
-
-def calculate_condenced_delta(dist_matrix, tries, heuristic):
-    diam = np.max(dist_matrix)
-    if heuristic == True:
-        delta = delta_hyp_condensed_heuristic(dist_matrix)
-    else:
-        delta = delta_hyp_condensed(dist_matrix, tries, heuristic)
-    return 2 * delta / diam, diam
+from hypdelta.calculus_utils import s_delta
 
 
 @njit(parallel=True)
-def delta_hyp_condensed(dist_condensed: np.ndarray, n_samples: int) -> float:
+def calculate_delta_condensed(dist_condensed: np.ndarray, n_samples: int) -> float:
     """
     Compute the delta hyperbolicity value from the condensed distance matrix representation.
     This is a more efficient analog of the `delta_hyp` function.
@@ -86,7 +77,7 @@ def delta_hyp_condensed(dist_condensed: np.ndarray, n_samples: int) -> float:
 
 
 @njit(parallel=True)
-def delta_hyp_condensed_heuristic(dist: np.ndarray) -> float:
+def calculate_delta_heuristic(dist: np.ndarray) -> float:
     """
     Compute the delta hyperbolicity value from the condensed distance matrix representation.
     This is a modified version of the `delta_hyp_condenced` function.
@@ -130,3 +121,12 @@ def delta_hyp_condensed_heuristic(dist: np.ndarray) -> float:
                 delta_hyp_k = s_delta(dist, ind_i, ind_j, k, delta_hyp_k)
         delta_hyp[k] = delta_hyp_k
     return 0.5 * np.max(delta_hyp)
+
+
+def delta_condensed(dist_matrix, tries, heuristic):
+    diam = np.max(dist_matrix)
+    if heuristic == True:
+        delta = calculate_delta_heuristic(dist_matrix)
+    else:
+        delta = calculate_delta_condensed(dist_matrix, tries, heuristic)
+    return 2 * delta / diam, diam
