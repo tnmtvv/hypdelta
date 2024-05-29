@@ -2,7 +2,7 @@ from typing import Tuple
 from sklearn.metrics import pairwise_distances
 import numpy as np
 from numba import cuda
-from hypdelta.cudaprep import cuda_prep_naive
+from hyppy.cudaprep import cuda_prep_naive
 
 
 def delta_naive_cpu(dist_matrix: np.ndarray) -> Tuple[float, float]:

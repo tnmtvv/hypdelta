@@ -1,7 +1,7 @@
-from hypdelta.naive import delta_naive_cpu, delta_naive_gpu
-from hypdelta.fast import delta_CCL_cpu, delta_CCL_gpu
-from hypdelta.condensed import delta_condensed
-from hypdelta.cartesian import delta_cartesian
+from hyppy.naive import delta_naive_cpu, delta_naive_gpu
+from hyppy.fast import delta_CCL_cpu, delta_CCL_gpu
+from hyppy.condensed import delta_condensed
+from hyppy.cartesian import delta_cartesian
 
 
 class GPUNotImplemented(Exception):
@@ -82,16 +82,16 @@ def hypdelta(
             delta = delta_naive_gpu(distance_matrix, threadsperblock)
     elif strategy == "condensed":
         if device == "cpu":
-            delta = delta(distance_matrix, tries, heuristic)
+            delta = delta_condensed(distance_matrix, tries, heuristic)
         elif device == "gpu":
             raise GPUNotImplemented(
                 "The 'condensed' strategy is not implemented for GPU."
             )
-    if strategy == "CCL":
+    elif strategy == "CCL":
         if device == "cpu":
             delta = delta_CCL_cpu(distance_matrix, l)
         elif device == "gpu":
             delta = delta_CCL_gpu(distance_matrix, l, threadsperblock)
-    if strategy == "cartesian":
-        delta = delta_cartesian()
+    elif strategy == "cartesian":
+        delta = delta_cartesian(distance_matrix, l, 1024)
     return delta

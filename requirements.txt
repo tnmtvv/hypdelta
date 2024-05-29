@@ -1,0 +1,8 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+
+pip=22.2
+python=3.9
+numba=0.57.1
+numpy=1.25.2
+

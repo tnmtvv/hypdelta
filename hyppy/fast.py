@@ -2,8 +2,8 @@ import numpy as np
 from numba import njit, prange, typed, cuda
 from typing import List, Tuple, Dict
 
-from hypdelta.calculus_utils import get_far_away_pairs, prepare_batch_indices_flat
-from hypdelta.cudaprep import cuda_prep_CCL, cuda_prep_cartesian
+from hyppy.calculus_utils import get_far_away_pairs, prepare_batch_indices_flat
+from hyppy.cudaprep import cuda_prep_CCL, cuda_prep_cartesian
 
 
 def delta_CCL_cpu(dist_matrix: np.ndarray, l: float) -> Tuple[float, float]:
@@ -24,7 +24,7 @@ def delta_CCL_cpu(dist_matrix: np.ndarray, l: float) -> Tuple[float, float]:
     """
     n = dist_matrix.shape[0]
     diam = np.max(dist_matrix)
-    far_away_pairs = get_far_away_pairs(dist_matrix, int(n * (n + 1)) / 2 * l)
+    far_away_pairs = get_far_away_pairs(dist_matrix, int((n * (n + 1) / 2) * l))
     delta = delta_hyp_CCL(typed.List(far_away_pairs), dist_matrix)
     return 2 * delta / diam, diam
 
@@ -75,7 +75,7 @@ def delta_CCL_gpu(
     diam = np.max(dist_matrix)
     n = dist_matrix.shape[0]
 
-    far_away_pairs = get_far_away_pairs(int(n * (n + 1)) / 2 * l)
+    far_away_pairs = get_far_away_pairs(int((n * (n + 1) / 2) * l))
     (
         n,
         x_coord_pairs,

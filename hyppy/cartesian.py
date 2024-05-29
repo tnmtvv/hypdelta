@@ -1,12 +1,13 @@
 import numpy as np
 from numba import cuda
 
-from hypdelta.calculus_utils import (
+from hyppy.calculus_utils import (
     get_far_away_pairs,
     prepare_batch_indices_flat,
     batch_flatten,
+    calc_max_lines,
 )
-from hypdelta.cudaprep import cuda_prep_cartesian
+from hyppy.cudaprep import cuda_prep_cartesian
 
 
 @cuda.jit
@@ -52,7 +53,7 @@ def gpu_cartesian(dist_array, delta_res):
     )
 
 
-def delta_cartesian(dist_matrix, batch_size, l, all_threads):
+def delta_cartesian(dist_matrix, l, all_threads):
     """
     Computes the delta hyperbolicity of a given distance matrix using a Cartesian approach.
 
@@ -63,8 +64,6 @@ def delta_cartesian(dist_matrix, batch_size, l, all_threads):
     -----------
     dist_matrix : np.ndarray
         A 2D array representing the distance matrix.
-    batch_size : int
-        The number of pairs to process in each batch.
     l : int
         A parameter to determine the fraction of far away pairs to consider.
     all_threads : int
@@ -87,6 +86,8 @@ def delta_cartesian(dist_matrix, batch_size, l, all_threads):
 
     far_away_pairs = get_far_away_pairs(dist_matrix, int((n * (n + 1) / 2) * l))
     len_far_away = len(far_away_pairs)
+
+    batch_size = calc_max_lines(self.mem_gpu_bound, len_far_away)
 
     cartesian_size = int(len_far_away * (len_far_away - 1) / 2)
     batch_N = np.ceil(cartesian_size // batch_size)

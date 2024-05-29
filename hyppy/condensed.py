@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit, prange
 
-from hypdelta.calculus_utils import s_delta
+from hyppy.calculus_utils import *
 
 
 @njit(parallel=True)
@@ -13,14 +13,14 @@ def calculate_delta_condensed(dist_condensed: np.ndarray, n_samples: int) -> flo
     Parameters
     ----------
     dist_condensed : numpy.ndarray
-        A 1D array representing the condensed distance matrix of the network.
+        A 1D array representing the condensed distance matrix of the dataset.
     n_samples : int
-        The number of nodes in the network.
+        The number of nodes in the dataset.
 
     Returns
     -------
     float
-        The delta hyperbolicity of the network.
+        The delta hyperbolicity of the dataset.
 
     Notes
     -----
@@ -77,14 +77,14 @@ def calculate_delta_condensed(dist_condensed: np.ndarray, n_samples: int) -> flo
 
 
 @njit(parallel=True)
-def calculate_delta_heuristic(dist: np.ndarray) -> float:
+def calculate_delta_heuristic(dist_matrix: np.ndarray) -> float:
     """
     Compute the delta hyperbolicity value from the condensed distance matrix representation.
     This is a modified version of the `delta_hyp_condenced` function.
 
     Parameters
     ----------
-    dist_condensed : numpy.ndarray
+    dist_matrix : numpy.ndarray
         A 1D array representing the condensed distance matrix of the dataset.
     n_samples : int
         The number of nodes in the dataset.
@@ -104,21 +104,21 @@ def calculate_delta_heuristic(dist: np.ndarray) -> float:
     -----
     The idea is that we can select points partly randomly to achieve a better covering of an item space.
     """
-    items = dist.shape[0]
-    delta_hyp = np.zeros(items, dtype=dist.dtype)
-    const = min(50, dist.shape[0] - 1)
+    items = dist_matrix.shape[0]
+    delta_hyp = np.zeros(items, dtype=dist_matrix.dtype)
+    const = min(50, dist_matrix.shape[0] - 1)
 
     for k in prange(items):
         delta_hyp_k = 0.0
-        inds_i = np.argpartition(dist[k - 1], -const)
+        inds_i = np.argpartition(dist_matrix[k - 1], -const)
         considered_i = inds_i[-const:]
 
         for ind_i in considered_i:
-            inds_j = np.argpartition(dist[ind_i - 1], -const)
+            inds_j = np.argpartition(dist_matrix[ind_i - 1], -const)
             considered_j = inds_j[-const:]
 
             for ind_j in considered_j:
-                delta_hyp_k = s_delta(dist, ind_i, ind_j, k, delta_hyp_k)
+                delta_hyp_k = s_delta(dist_matrix, ind_i, ind_j, k, delta_hyp_k)
         delta_hyp[k] = delta_hyp_k
     return 0.5 * np.max(delta_hyp)
 
@@ -128,5 +128,5 @@ def delta_condensed(dist_matrix, tries, heuristic):
     if heuristic == True:
         delta = calculate_delta_heuristic(dist_matrix)
     else:
-        delta = calculate_delta_condensed(dist_matrix, tries, heuristic)
+        delta = calculate_delta_condensed(dist_matrix, tries)
     return 2 * delta / diam, diam
