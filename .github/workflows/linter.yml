@@ -1,8 +1,5 @@
 name: Lint Code Base
-on:
-  push:
-    branches:
-      - experiments
+on: push
 
 
 jobs:
