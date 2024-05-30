@@ -1,6 +1,6 @@
 import pytest
 
-from utils import *
+from tests.utils import *
 
 from src.hyppy import hypdelta
 from sklearn.metrics import pairwise_distances
