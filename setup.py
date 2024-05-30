@@ -1,0 +1,1 @@
+packages = ["src/hyppy", "tests"]

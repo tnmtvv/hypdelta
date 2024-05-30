@@ -2,10 +2,7 @@ import pytest
 
 from utils import *
 
-try:
-    from hyppy import hypdelta
-except (ModuleNotFoundError, ImportError):
-    from .hyppy import hypdelta
+from src.hyppy import hypdelta
 from sklearn.metrics import pairwise_distances
 from scipy.spatial.distance import pdist
 
