@@ -1,5 +1,6 @@
 # hyppy
-![Logo](kandinsky-download-1717098433035.png)
+![Logo](https://drive.google.com/file/d/1E7h-GATJW9sAlZU-0Pn8p_UZSblQ-A86/view?usp=drive_link)
+
 `hyppy` is a Python library for calculating delta hyperbolicity of distance matrices using various strategies and computational devices (CPU/GPU). It provides flexibility in choosing the method and device for computation to balance between accuracy and performance.
 
 ## Features
