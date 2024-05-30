@@ -31,7 +31,7 @@ class CPUNotImplemented(Exception):
 def hypdelta(
     distance_matrix,
     device=["cpu", "gpu"],
-    strategy=["naive", "condensed", "heuristic", "CCL"],
+    strategy=["naive", "condensed", "heuristic", "CCL", "cartesian"],
     l=0.05,
     tries=25,
     heuristic=True,
@@ -39,45 +39,47 @@ def hypdelta(
     max_threads=1024,
 ):
     """
-    Compute the delta-hyperbolicity of a distance matrix using various strategies on different devices.
+    Computes the delta hyperbolicity of a distance matrix using various strategies and devices.
 
-    Parameters
-    ----------
-    distance_matrix : numpy.ndarray
-        The matrix containing pairwise distances between points.
+    Parameters:
+    -----------
+    distance_matrix : np.ndarray
+        The distance matrix for which delta hyperbolicity is to be computed.
+
     device : list of str, optional
-        The device(s) to run the computation on, either "cpu" or "cuda".
+        The device to use for computation, can be "cpu" or "gpu". Default is ["cpu", "gpu"].
+
     strategy : list of str, optional
-        The strategy to use for computation. Options are "naive", "condenced", "heuristic", and "CCL".
+        The strategy to use for computation. Options are "naive", "condensed", "heuristic", "CCL", and "cartesian". Default is ["naive", "condensed", "heuristic", "CCL", "cartesian"].
+
     l : float, optional
-        The proportion of far-away pairs to consider for the CCL strategy. Default is 0.05.
+        A parameter for certain strategies like "CCL". Default is 0.05.
+
     tries : int, optional
-        The number of tries for the "condensed" strategy. Default is 25.
+        Number of tries for the "condensed" strategy. Default is 25.
+
     heuristic : bool, optional
-        Whether to use heuristics for the "condenced" strategy. Default is True.
+        Whether to use heuristic methods for the "condensed" strategy. Default is True.
+
     threadsperblock : tuple of int, optional
-        Parameter needed for "CCL" and "naive" strategies when device == "gpu".
-        The number of threads per block for GPU computation. (Tuple of 2 for CCL on gpu strategy, tuple of 3 for naive strategy). Default is (16, 16, 4).
+        The number of threads per block for GPU computation. Default is (16, 16, 4).
+
     max_threads : int, optional
-        Parameter needed for "cartesian" strategy when device == "gpu".
-        The number of threads for GPU computation. Default is 1024.
+        The maximum number of threads to use for GPU computation in the "cartesian" strategy. Default is 1024.
 
-    Returns
-    -------
+    Returns:
+    --------
     float
-        The computed delta-hyperbolicity.
+        The computed delta hyperbolicity of the distance matrix.
 
-    Raises
-    ------
+    Raises:
+    -------
     GPUNotImplemented
-        If the selected strategy is not implemented for GPU.
+        If the chosen strategy is not implemented for the GPU device.
 
-    Notes
-    -----
-    This function supports multiple strategies and devices for computing the delta-hyperbolicity of a distance matrix:
-    - "naive" strategy is implemented for both CPU and GPU.
-    - "condenced" strategy is implemented for CPU only.
-    - "CCL" strategy is implemented for both CPU and GPU.
+    Notes:
+    ------
+    The function determines the delta hyperbolicity using the specified strategy and device. Different strategies have different computational complexities and are suitable for different types of data and computational resources.
     """
     if strategy == "naive":
         if device == "cpu":
