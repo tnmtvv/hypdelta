@@ -15,20 +15,24 @@ from scipy.spatial.distance import pdist
         generate_synthetic_points(500, 1000),
     ],
 )
-def test_CCL_true_delta(points):
+def test_CCL_CPU_GPU():
+    dist_matrix = generate_dists(500)
 
-    dist_matrix = pairwise_distances(points)
+    delta_GPU = hypdelta(
+        dist_matrix,
+        device="gpu",
+        strategy="CCL",
+        l=0.05,
+    )
 
-    delta_CCL = hypdelta(
+    delta_CPU = hypdelta(
         dist_matrix,
         device="cpu",
         strategy="CCL",
-        l=0.1,
+        l=0.05,
     )
 
-    delta_naive = hypdelta(dist_matrix, device="cpu", strategy="naive")
-
-    assert delta_CCL == pytest.approx(delta_naive, 0.001)
+    assert delta_GPU == pytest.approx(delta_CPU, 0.001)
 
 
 @pytest.mark.parametrize(
@@ -40,21 +44,22 @@ def test_CCL_true_delta(points):
         generate_synthetic_points(500, 1000),
     ],
 )
-def test_condenced_true_delta(points):
+def test_CCL_batch(points):
 
     dist_matrix = pairwise_distances(points)
-    dist_matrix_condesed = pdist(points)
 
-    delta_condensed = hypdelta(
-        dist_matrix_condesed,
-        device="cpu",
-        strategy="condensed",
-        tries=25,
-        heuristic=False,
+    delta_CCL = hypdelta(
+        dist_matrix,
+        device="gpu",
+        strategy="CCL",
+        l=0.05,
     )
 
-    delta_condensed_heuristic = hypdelta(
-        dist_matrix, device="cpu", strategy="condensed", tries=25
+    delta_cartesian = hypdelta(
+        dist_matrix,
+        device="gpu",
+        strategy="cartesian",
+        l=0.05,
     )
 
-    assert delta_condensed == pytest.approx(delta_condensed_heuristic, 0.001)
+    assert delta_CCL == pytest.approx(delta_cartesian, 0.001)
