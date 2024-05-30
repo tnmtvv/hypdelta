@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit, prange
 
-from hyppy.calculus_utils import *
+from src.hyppy.calculus_utils import *
 
 
 @njit(parallel=True)

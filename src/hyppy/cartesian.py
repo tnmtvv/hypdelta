@@ -1,13 +1,13 @@
 import numpy as np
 from numba import cuda
 
-from hyppy.calculus_utils import (
+from src.hyppy.calculus_utils import (
     get_far_away_pairs,
     prepare_batch_indices_flat,
     batch_flatten,
     calc_max_lines,
 )
-from hyppy.cudaprep import cuda_prep_cartesian
+from src.hyppy.cudaprep import cuda_prep_cartesian
 
 
 @cuda.jit
