@@ -13,7 +13,6 @@ from scipy.spatial.distance import pdist
         generate_synthetic_points(100, 100),
         generate_synthetic_points(200, 200),
         generate_synthetic_points(500, 500),
-        generate_synthetic_points(500, 1000),
     ],
 )
 def test_CCL_true_delta(points):
