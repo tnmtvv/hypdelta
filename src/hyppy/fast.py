@@ -1,9 +1,9 @@
 import numpy as np
 from numba import njit, prange, typed, cuda
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 
-from hyppy.calculus_utils import get_far_away_pairs, prepare_batch_indices_flat
-from hyppy.cudaprep import cuda_prep_CCL, cuda_prep_cartesian
+from src.hyppy.calculus_utils import get_far_away_pairs, prepare_batch_indices_flat
+from src.hyppy.cudaprep import cuda_prep_CCL, cuda_prep_cartesian
 
 
 def delta_CCL_cpu(dist_matrix: np.ndarray, l: float) -> Tuple[float, float]:

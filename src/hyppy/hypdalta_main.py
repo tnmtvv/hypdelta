@@ -1,7 +1,7 @@
-from hyppy.naive import delta_naive_cpu, delta_naive_gpu
-from hyppy.fast import delta_CCL_cpu, delta_CCL_gpu
-from hyppy.condensed import delta_condensed
-from hyppy.cartesian import delta_cartesian
+from src.hyppy.naive import delta_naive_cpu, delta_naive_gpu
+from src.hyppy.fast import delta_CCL_cpu, delta_CCL_gpu
+from src.hyppy.condensed import delta_condensed
+from src.hyppy.cartesian import delta_cartesian
 
 
 class GPUNotImplemented(Exception):
@@ -36,6 +36,7 @@ def hypdelta(
     tries=25,
     heuristic=True,
     threadsperblock=(16, 16, 4),
+    max_threads=1024,
 ):
     """
     Compute the delta-hyperbolicity of a distance matrix using various strategies on different devices.
@@ -45,9 +46,9 @@ def hypdelta(
     distance_matrix : numpy.ndarray
         The matrix containing pairwise distances between points.
     device : list of str, optional
-        The device(s) to run the computation on, either "cpu" or "cuda". Default is ["cpu", "cuda"].
+        The device(s) to run the computation on, either "cpu" or "cuda".
     strategy : list of str, optional
-        The strategy to use for computation. Options are "naive", "condenced", "heuristic", and "CCL". Default is ["naive", "condenced", "heuristic", "CCL"].
+        The strategy to use for computation. Options are "naive", "condenced", "heuristic", and "CCL".
     l : float, optional
         The proportion of far-away pairs to consider for the CCL strategy. Default is 0.05.
     tries : int, optional
@@ -57,6 +58,9 @@ def hypdelta(
     threadsperblock : tuple of int, optional
         Parameter needed for "CCL" and "naive" strategies when device == "gpu".
         The number of threads per block for GPU computation. (Tuple of 2 for CCL on gpu strategy, tuple of 3 for naive strategy). Default is (16, 16, 4).
+    max_threads : int, optional
+        Parameter needed for "cartesian" strategy when device == "gpu".
+        The number of threads for GPU computation. Default is 1024.
 
     Returns
     -------
@@ -93,5 +97,5 @@ def hypdelta(
         elif device == "gpu":
             delta = delta_CCL_gpu(distance_matrix, l, threadsperblock)
     elif strategy == "cartesian":
-        delta = delta_cartesian(distance_matrix, l, 1024)
+        delta = delta_cartesian(distance_matrix, l, max_threads)
     return delta
