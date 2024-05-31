@@ -1,5 +1,4 @@
 from typing import Tuple
-from sklearn.metrics import pairwise_distances
 import numpy as np
 from numba import cuda
 

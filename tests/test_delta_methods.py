@@ -2,9 +2,8 @@ import pytest
 
 from tests.utils import *
 
-from src.hypdelta import hypdelta
+from src.hypdelta.delta import hypdelta
 from sklearn.metrics import pairwise_distances
-from scipy.spatial.distance import pdist
 
 
 @pytest.mark.parametrize(

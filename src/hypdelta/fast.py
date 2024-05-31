@@ -2,7 +2,7 @@ import numpy as np
 from numba import njit, prange, typed, cuda
 from typing import List, Tuple
 
-from src.hypdelta.calculus_utils import get_far_away_pairs, prepare_batch_indices_flat
+from src.hypdelta.calculus_utils import get_far_away_pairs
 from src.hypdelta.cudaprep import cuda_prep_CCL, cuda_prep_cartesian
 
 

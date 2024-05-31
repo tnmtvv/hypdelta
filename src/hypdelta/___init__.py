@@ -1,1 +1,1 @@
-from src.hypdelta.main import hypdelta
+from hypdelta.delta import hypdelta
