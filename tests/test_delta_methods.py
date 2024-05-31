@@ -2,7 +2,7 @@ import pytest
 
 from tests.utils import *
 
-from src.hypdelta import hypdelta
+from src.hypdelta.main import hypdelta
 from sklearn.metrics import pairwise_distances
 from scipy.spatial.distance import pdist
 
