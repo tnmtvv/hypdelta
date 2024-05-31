@@ -8,7 +8,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="hypdelta",
-    version="0.1.0",
+    version="0.1.1",
     author="Tanya Matveeva",
     author_email="tpmatveeva@hse.ru",
     description="A Python library for calculating delta hyperbolicity.",
