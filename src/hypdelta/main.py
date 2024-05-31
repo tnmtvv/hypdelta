@@ -37,6 +37,7 @@ def hypdelta(
     heuristic=True,
     threadsperblock=(16, 16, 4),
     max_threads=1024,
+    max_gpu_mem=16,
 ):
     """
     Computes the delta hyperbolicity of a distance matrix using various strategies and devices.
@@ -66,6 +67,9 @@ def hypdelta(
 
     max_threads : int, optional
         The maximum number of threads to use for GPU computation in the "cartesian" strategy. Default is 1024.
+
+    max_gpu_mem : int, optional
+        The maximum gpu memory in Gb. Used in "cartesian" strategy. Default is 16.
 
     Returns:
     --------
@@ -99,5 +103,5 @@ def hypdelta(
         elif device == "gpu":
             delta = delta_CCL_gpu(distance_matrix, l, threadsperblock)
     elif strategy == "cartesian":
-        delta = delta_cartesian(distance_matrix, l, max_threads)
+        delta = delta_cartesian(distance_matrix, l, max_threads, max_gpu_mem)
     return delta

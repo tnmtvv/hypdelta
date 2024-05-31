@@ -53,7 +53,7 @@ def gpu_cartesian(dist_array, delta_res):
     )
 
 
-def delta_cartesian(dist_matrix, l, all_threads):
+def delta_cartesian(dist_matrix, l, all_threads, mem_gpu_bound):
     """
     Computes the delta hyperbolicity of a given distance matrix using a Cartesian approach.
 
@@ -68,6 +68,8 @@ def delta_cartesian(dist_matrix, l, all_threads):
         A parameter to determine the fraction of far away pairs to consider.
     all_threads : int
         The number of threads to use for GPU computation.
+    mem_gpu_bound: int
+        Max available gpu memory in Gb.
 
     Returns:
     --------
@@ -87,7 +89,7 @@ def delta_cartesian(dist_matrix, l, all_threads):
     far_away_pairs = get_far_away_pairs(dist_matrix, int((n * (n + 1) / 2) * l))
     len_far_away = len(far_away_pairs)
 
-    batch_size = calc_max_lines(self.mem_gpu_bound, len_far_away)
+    batch_size = calc_max_lines(mem_gpu_bound, len_far_away)
 
     cartesian_size = int(len_far_away * (len_far_away - 1) / 2)
     batch_N = np.ceil(cartesian_size // batch_size)
@@ -114,4 +116,4 @@ def delta_cartesian(dist_matrix, l, all_threads):
         del cartesian_dist_array
         del batch
     delta = max(deltas)
-    return delta, diam
+    return delta
