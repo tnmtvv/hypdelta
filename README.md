@@ -1,7 +1,7 @@
-# hyppy
+# hypdelta
 # ![Logo](https://i.imgur.com/3RALASK.png)
 
-`hyppy` is a Python library for calculating delta hyperbolicity of distance matrices using various strategies and computational devices (CPU/GPU). It provides flexibility in choosing the method and device for computation to balance between accuracy and performance.
+`hypdelta` is a Python library for calculating delta hyperbolicity of distance matrices using various strategies and computational devices (CPU/GPU). It provides flexibility in choosing the method and device for computation to balance between accuracy and performance.
 
 ## Features
 
@@ -11,21 +11,21 @@
 
 ## Installation
 
-To install `hyppy`, you can clone the repository and install the requirements:
+To install `hypdelta`, you can clone the repository and install the requirements:
 
 ```bash
-git clone https://github.com/tnmtvv/hyppy.git
-cd hyppy
+git clone https://github.com/tnmtvv/hypdelta.git
+cd hypdelta
 pip install -r requirements.txt
 ```
 
 ## Usage
 
-Here's a basic example to get you started with `hyppy`:
+Here's a basic example to get you started with `hypdelta`:
 
 ```python
 import numpy as np
-from hyppy import hypdelta
+from hypdelta import hypdelta
 
 # Generate a synthetic distance matrix
 def generate_synthetic_points(dimensions, num_points):
