@@ -23,8 +23,8 @@ setup(
     ],
     python_requires=">=3.9",
     install_requires=[
-        "numpy>=1.18.0",
-        "numba>=0.48.0",
+        "numpy>=1.24.4",
+        "numba>=0.57.1",
         "scipy>=1.4.0",
     ],
 )
