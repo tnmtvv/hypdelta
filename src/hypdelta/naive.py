@@ -2,10 +2,10 @@ from typing import Tuple
 import numpy as np
 from numba import cuda
 
-from src.hypdelta.cudaprep import cuda_prep_naive
+from hypdelta.cudaprep import cuda_prep_naive
 
 
-def delta_naive_cpu(dist_matrix: np.ndarray) -> Tuple[float, float]:
+def delta_naive_cpu(dist_matrix: np.ndarray) -> float:
     """
     Computes the naive delta and diameter of a distance matrix using CPU.
 
@@ -16,8 +16,8 @@ def delta_naive_cpu(dist_matrix: np.ndarray) -> Tuple[float, float]:
 
     Returns:
     --------
-    Tuple[float, float]
-        A tuple containing the delta and the diameter.
+    float
+        Сontaining the delta.
     """
     delta = 0
     diam = np.max(dist_matrix)
@@ -27,7 +27,7 @@ def delta_naive_cpu(dist_matrix: np.ndarray) -> Tuple[float, float]:
         XY_p = 0.5 * (row + col - dist_matrix)
         maxmin = np.max(np.minimum(XY_p[:, :, None], XY_p[None, :, :]), axis=1)
         delta = max(delta, np.max(maxmin - XY_p))
-    return 2 * delta / diam, diam
+    return 2 * delta / diam
 
 
 @cuda.jit
@@ -77,7 +77,7 @@ def true_delta_gpu(
 
 def delta_naive_gpu(
     dist_matrix: np.ndarray, threadsperblock: Tuple[int, int, int]
-) -> Tuple[float, float]:
+) -> float:
     """
     Computes the naive delta and diameter of a distance matrix using GPU.
 
@@ -91,8 +91,8 @@ def delta_naive_gpu(
 
     Returns:
     --------
-    Tuple[float, float]
-        A tuple containing the delta and the diameter.
+    float
+        Сontaining the delta.
     """
     diam = np.max(dist_matrix)
     adj_m, k, delta_res, threadsperblock, blockspergrid = cuda_prep_naive(
@@ -100,4 +100,4 @@ def delta_naive_gpu(
     )
     true_delta_gpu[blockspergrid, threadsperblock](adj_m, delta_res, k)
     delta = delta_res[0]
-    return 2 * delta / diam, diam
+    return 2 * delta / diam

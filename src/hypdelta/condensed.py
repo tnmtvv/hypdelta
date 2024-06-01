@@ -1,7 +1,7 @@
 import numpy as np
 from numba import njit, prange
 
-from src.hypdelta.calculus_utils import *
+from hypdelta.calculus_utils import *
 
 
 @njit(parallel=True)
@@ -129,4 +129,4 @@ def delta_condensed(dist_matrix, tries, heuristic):
         delta = calculate_delta_heuristic(dist_matrix)
     else:
         delta = calculate_delta_condensed(dist_matrix, tries)
-    return 2 * delta / diam, diam
+    return 2 * delta / diam

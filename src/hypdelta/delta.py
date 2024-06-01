@@ -1,7 +1,7 @@
-from src.hypdelta.naive import delta_naive_cpu, delta_naive_gpu
-from src.hypdelta.fast import delta_CCL_cpu, delta_CCL_gpu
-from src.hypdelta.condensed import delta_condensed
-from src.hypdelta.cartesian import delta_cartesian
+from hypdelta.naive import delta_naive_cpu, delta_naive_gpu
+from hypdelta.fast import delta_CCL_cpu, delta_CCL_gpu
+from hypdelta.condensed import delta_condensed
+from hypdelta.cartesian import delta_cartesian
 
 
 class GPUNotImplemented(Exception):

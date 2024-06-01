@@ -2,11 +2,11 @@ import numpy as np
 from numba import njit, prange, typed, cuda
 from typing import List, Tuple
 
-from src.hypdelta.calculus_utils import get_far_away_pairs
-from src.hypdelta.cudaprep import cuda_prep_CCL, cuda_prep_cartesian
+from hypdelta.calculus_utils import get_far_away_pairs
+from hypdelta.cudaprep import cuda_prep_CCL, cuda_prep_cartesian
 
 
-def delta_CCL_cpu(dist_matrix: np.ndarray, l: float) -> Tuple[float, float]:
+def delta_CCL_cpu(dist_matrix: np.ndarray, l: float) -> float:
     """
     Computes the delta hyperbolicity using the CCL method on the CPU.
 
@@ -19,21 +19,21 @@ def delta_CCL_cpu(dist_matrix: np.ndarray, l: float) -> Tuple[float, float]:
 
     Returns:
     --------
-    Tuple[float, float]
+    float
         The computed delta hyperbolicity and the diameter of the distance matrix.
     """
     n = dist_matrix.shape[0]
     diam = np.max(dist_matrix)
     far_away_pairs = get_far_away_pairs(dist_matrix, int((n * (n + 1) / 2) * l))
     delta = delta_hyp_CCL(typed.List(far_away_pairs), dist_matrix)
-    return 2 * delta / diam, diam
+    return 2 * delta / diam
 
 
 def delta_CCL_gpu(
     dist_matrix: np.ndarray,
     l: float,
     threadsperblock: Tuple[int, int] = (32, 32),
-) -> Tuple[float, float]:
+) -> float:
     """
     Compute the delta-hyperbolicity of a distance matrix using GPU acceleration.
 
@@ -54,9 +54,6 @@ def delta_CCL_gpu(
     delta : float
         The computed delta-hyperbolicity value.
 
-    diam : float
-        The diameter of the graph represented by the distance matrix, i.e., the maximum distance between any two nodes.
-
     Notes:
     -----
     This function uses CUDA for GPU acceleration to compute the delta-hyperbolicity, which significantly speeds up
@@ -69,7 +66,7 @@ def delta_CCL_gpu(
     >>>                         [2, 1, 0]])
     >>> l = {'threshold': 0.5}
     >>> delta, diam = CCL_gpu(dist_matrix, l)
-    >>> print(delta, diam)
+    >>> print(delta)
     0.6666666666666666, 2.0
     """
     diam = np.max(dist_matrix)
@@ -89,7 +86,7 @@ def delta_CCL_gpu(
         n, x_coord_pairs, y_coord_pairs, adj_m, delta_res
     )
     delta, _ = 2 * delta_res[0] / diam
-    return delta, diam
+    return delta
 
 
 @njit(parallel=True, fastmath=True)

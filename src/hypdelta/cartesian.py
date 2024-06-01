@@ -1,13 +1,13 @@
 import numpy as np
 from numba import cuda
 
-from src.hypdelta.calculus_utils import (
+from hypdelta.calculus_utils import (
     get_far_away_pairs,
     prepare_batch_indices_flat,
     batch_flatten,
     calc_max_lines,
 )
-from src.hypdelta.cudaprep import cuda_prep_cartesian
+from hypdelta.cudaprep import cuda_prep_cartesian
 
 
 @cuda.jit
@@ -75,8 +75,6 @@ def delta_cartesian(dist_matrix, l, all_threads, mem_gpu_bound):
     --------
     delta : float
         The maximum delta hyperbolicity value computed.
-    diam : float
-        The diameter of the distance matrix.
 
     Notes:
     ------
@@ -112,8 +110,8 @@ def delta_cartesian(dist_matrix, l, all_threads, mem_gpu_bound):
             blockspergrid,
         ) = cuda_prep_cartesian(batch, all_threads)
         gpu_cartesian[blockspergrid, threadsperblock](cartesian_dist_array, delta_res)
-        deltas[i] = 2 * delta_res[0] / diam
+        deltas[i] = delta_res[0]
         del cartesian_dist_array
         del batch
     delta = max(deltas)
-    return delta
+    return 2 * delta_res[0] / diam
