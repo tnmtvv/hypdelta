@@ -1,0 +1,12 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+
+numba==0.57.1
+numpy==1.24.4
+pytest==7.4.3
+PyYAML==6.0.1
+scikit_learn==1.3.0
+scipy==1.11.2
+
+
+

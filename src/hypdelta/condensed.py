@@ -1,20 +1,11 @@
 import numpy as np
 from numba import njit, prange
 
-from hypdelta.utils import s_delta
-
-
-def calculate_condenced_delta(dist_matrix, tries, heuristic):
-    diam = np.max(dist_matrix)
-    if heuristic == True:
-        delta = delta_hyp_condensed_heuristic(dist_matrix)
-    else:
-        delta = delta_hyp_condensed(dist_matrix, tries, heuristic)
-    return 2 * delta / diam, diam
+from hypdelta.calculus_utils import *
 
 
 @njit(parallel=True)
-def delta_hyp_condensed(dist_condensed: np.ndarray, n_samples: int) -> float:
+def calculate_delta_condensed(dist_condensed: np.ndarray, n_samples: int) -> float:
     """
     Compute the delta hyperbolicity value from the condensed distance matrix representation.
     This is a more efficient analog of the `delta_hyp` function.
@@ -22,14 +13,14 @@ def delta_hyp_condensed(dist_condensed: np.ndarray, n_samples: int) -> float:
     Parameters
     ----------
     dist_condensed : numpy.ndarray
-        A 1D array representing the condensed distance matrix of the network.
+        A 1D array representing the condensed distance matrix of the dataset.
     n_samples : int
-        The number of nodes in the network.
+        The number of nodes in the dataset.
 
     Returns
     -------
     float
-        The delta hyperbolicity of the network.
+        The delta hyperbolicity of the dataset.
 
     Notes
     -----
@@ -86,14 +77,14 @@ def delta_hyp_condensed(dist_condensed: np.ndarray, n_samples: int) -> float:
 
 
 @njit(parallel=True)
-def delta_hyp_condensed_heuristic(dist: np.ndarray) -> float:
+def calculate_delta_heuristic(dist_matrix: np.ndarray) -> float:
     """
     Compute the delta hyperbolicity value from the condensed distance matrix representation.
     This is a modified version of the `delta_hyp_condenced` function.
 
     Parameters
     ----------
-    dist_condensed : numpy.ndarray
+    dist_matrix : numpy.ndarray
         A 1D array representing the condensed distance matrix of the dataset.
     n_samples : int
         The number of nodes in the dataset.
@@ -113,20 +104,52 @@ def delta_hyp_condensed_heuristic(dist: np.ndarray) -> float:
     -----
     The idea is that we can select points partly randomly to achieve a better covering of an item space.
     """
-    items = dist.shape[0]
-    delta_hyp = np.zeros(items, dtype=dist.dtype)
-    const = min(50, dist.shape[0] - 1)
+    items = dist_matrix.shape[0]
+    delta_hyp = np.zeros(items, dtype=dist_matrix.dtype)
+    const = min(50, dist_matrix.shape[0] - 1)
 
     for k in prange(items):
         delta_hyp_k = 0.0
-        inds_i = np.argpartition(dist[k - 1], -const)
+        inds_i = np.argpartition(dist_matrix[k - 1], -const)
         considered_i = inds_i[-const:]
 
         for ind_i in considered_i:
-            inds_j = np.argpartition(dist[ind_i - 1], -const)
+            inds_j = np.argpartition(dist_matrix[ind_i - 1], -const)
             considered_j = inds_j[-const:]
 
             for ind_j in considered_j:
-                delta_hyp_k = s_delta(dist, ind_i, ind_j, k, delta_hyp_k)
+                delta_hyp_k = s_delta(dist_matrix, ind_i, ind_j, k, delta_hyp_k)
         delta_hyp[k] = delta_hyp_k
     return 0.5 * np.max(delta_hyp)
+
+
+def delta_condensed(dist_matrix, tries, heuristic):
+    """
+    Compute the delta hyperbolicity using a condensed algorithm.
+
+    Parameters:
+    -----------
+    dist_matrix : np.ndarray
+        The distance matrix where dist_matrix[i][j] represents the distance between points i and j.
+    tries : int
+        The number of iterations to perform when calculating the delta hyperbolicity using the non-heuristic approach.
+    heuristic : bool
+        If True, use a heuristic approach to calculate the delta hyperbolicity. If False, use the full condensed algorithm.
+
+    Returns:
+    --------
+    float
+        The delta hyperbolicity value normalized by the diameter of the distance matrix.
+
+    Notes:
+    ------
+    The function first calculates the diameter of the distance matrix, which is the maximum distance between any pair of points.
+    Depending on the value of the heuristic parameter, it either uses a heuristic method or a full condensed algorithm to compute the delta hyperbolicity.
+    The result is then normalized by the diameter to obtain the final delta hyperbolicity value.
+    """
+    diam = np.max(dist_matrix)
+    if heuristic == True:
+        delta = calculate_delta_heuristic(dist_matrix)
+    else:
+        delta = calculate_delta_condensed(dist_matrix, tries)
+    return 2 * delta / diam

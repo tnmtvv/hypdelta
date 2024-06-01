@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "hypdelta"
+version = "0.1.22"
+description = "A Python library for calculating delta hyperbolicity."
+authors = ["Maveeva Tatyana <tpmatveeva@hse.ru>"]
+readme = "README.md"
+license = "LICENSE"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/tnmtvv/hypdelta"
+
+[project.dependencies]
+python = "^3.9.0"
+numpy = "=1.24.4"
+numba = "=0.57.1"
+scipy = "=1.4.0"
+
+[tool.setuptools.packages.find]
+where = ["src"]
