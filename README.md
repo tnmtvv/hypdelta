@@ -1,6 +1,8 @@
 # hypdelta
 # ![Logo](https://i.imgur.com/3RALASK.png)
 
+![example workflow](https://github.com/tnmtvv/hypdelta/actions/workflows/tests.yml/badge.svg)
+
 `hypdelta` is a Python library for calculating delta hyperbolicity of distance matrices using various strategies and computational devices (CPU/GPU). It provides flexibility in choosing the method and device for computation to balance between accuracy and performance.
 
 ## Features

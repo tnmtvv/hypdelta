@@ -3,7 +3,7 @@ from numba import njit, prange, typed, cuda
 from typing import List, Tuple
 
 from hypdelta.calculus_utils import get_far_away_pairs
-from hypdelta.cudaprep import cuda_prep_CCL, cuda_prep_cartesian
+from hypdelta.cudaprep import cuda_prep_CCL
 
 
 def delta_CCL_cpu(dist_matrix: np.ndarray, l: float) -> float:
@@ -72,7 +72,7 @@ def delta_CCL_gpu(
     diam = np.max(dist_matrix)
     n = dist_matrix.shape[0]
 
-    far_away_pairs = get_far_away_pairs(int((n * (n + 1) / 2) * l))
+    far_away_pairs = get_far_away_pairs(dist_matrix, int((n * (n + 1) / 2) * l))
     (
         n,
         x_coord_pairs,
@@ -85,8 +85,8 @@ def delta_CCL_gpu(
     delta_hyp_CCL_GPU[blockspergrid, threadsperblock](
         n, x_coord_pairs, y_coord_pairs, adj_m, delta_res
     )
-    delta, _ = 2 * delta_res[0] / diam
-    return delta
+    deltahyp = 2 * delta_res[0] / diam
+    return deltahyp
 
 
 @njit(parallel=True, fastmath=True)

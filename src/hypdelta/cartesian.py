@@ -90,7 +90,7 @@ def delta_cartesian(dist_matrix, l, all_threads, mem_gpu_bound):
     batch_size = calc_max_lines(mem_gpu_bound, len_far_away)
 
     cartesian_size = int(len_far_away * (len_far_away - 1) / 2)
-    batch_N = np.ceil(cartesian_size // batch_size)
+    batch_N = max(1, np.ceil(cartesian_size // batch_size))
 
     deltas = np.empty(batch_N)
 
