@@ -85,6 +85,8 @@ And the following devices:
 - `heuristic`: Whether to use heuristic methods for the `"condensed"` strategy. Default is True.
 - `threadsperblock`: The number of threads per block for GPU computation. Default is (16, 16, 4).
 - `max_threads`: The maximum number of threads to use for GPU computation in the `"cartesian"` strategy. Default is 1024.
+- `max_gpu_mem` : The maximum gpu memory in Gb. Used in `"cartesian"` strategy. Default is 16.
+
 
 ## Contributing
 

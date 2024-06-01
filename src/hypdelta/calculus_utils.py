@@ -23,9 +23,6 @@ def indx_to_2d(indx):
     return n, int(n - (S_n - indx) - 1)
 
 
-import math
-
-
 def calc_max_lines(gpu_mem_bound, pairs_len):
     """
     Calculates the maximum number of lines that can be processed based on GPU memory constraints.
@@ -149,6 +146,32 @@ def get_far_away_pairs(A: np.ndarray, N: int):
 
 @njit()
 def s_delta(dist, ind_i, ind_j, k, delta_hyp_k):
+    """
+    Calculate the delta hyperbolicity for a given set of distances.
+
+    Parameters:
+    -----------
+    dist : np.ndarray
+        A 2D array representing the distance matrix. dist[i][j] is the distance between points i and j.
+    ind_i : int
+        The index of the first point in the pair (i, j).
+    ind_j : int
+        The index of the second point in the pair (i, j).
+    k : int
+        The index of the third point k.
+    delta_hyp_k : float
+        The current maximum delta hyperbolicity value.
+
+    Returns:
+    --------
+    float
+        The updated delta hyperbolicity value.
+
+    Notes:
+    ------
+    This function uses the definition of delta hyperbolicity which is the maximum of the difference between
+    the two largest values among the sums of the distances for each triple (i, j, k).
+    """
     dist_0k = dist[0][k - 1]
     dist_0i = dist[0][ind_i]
     dist_ik = dist[ind_i][k - 1]
@@ -157,8 +180,10 @@ def s_delta(dist, ind_i, ind_j, k, delta_hyp_k):
     dist_jk = dist[ind_j][k - 1]
     dist_ij = dist[ind_i][ind_j]
 
-    # algo with S
+    # Compute the distances
     dist_array = [dist_0j + dist_ik, dist_0i + dist_jk, dist_0k + dist_ij]
     s2, s1 = sorted(dist_array)[-2:]
+
+    # Update delta_hyp_k with the maximum difference between the two largest sums
     delta_hyp_k = max(delta_hyp_k, s1 - s2)
     return max(delta_hyp_k, s1 - s2)
