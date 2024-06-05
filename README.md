@@ -1,5 +1,5 @@
 # hypdelta
-# ![Logo](logo.svg)
+# ![Logo](logo.png)
 
 ![example workflow](https://github.com/tnmtvv/hypdelta/actions/workflows/tests.yml/badge.svg)
 
