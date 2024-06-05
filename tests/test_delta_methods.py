@@ -22,7 +22,7 @@ def test_CCL_true_delta(points):
         dist_matrix,
         device="cpu",
         strategy="CCL",
-        l=0.2,
+        l=0.5,
     )
 
     delta_naive = hypdelta(dist_matrix, device="cpu", strategy="naive")
