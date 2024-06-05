@@ -1,5 +1,7 @@
 # hypdelta
-# ![Logo](logo.png)
+
+<img align="left" width="100" height="100" src="delta_logo.png">
+
 
 ![example workflow](https://github.com/tnmtvv/hypdelta/actions/workflows/tests.yml/badge.svg)
 
@@ -16,9 +18,7 @@
 To install `hypdelta`, you can clone the repository and install the requirements:
 
 ```bash
-git clone https://github.com/tnmtvv/hypdelta.git
-cd hypdelta
-pip install -r requirements.txt
+pip install hypdelta
 ```
 
 ## Usage
