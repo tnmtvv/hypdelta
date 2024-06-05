@@ -123,7 +123,10 @@ def calculate_delta_heuristic(dist_matrix: np.ndarray) -> float:
     return 0.5 * np.max(delta_hyp)
 
 
-def delta_condensed(dist_matrix, tries, heuristic):
+import numpy as np
+
+
+def delta_condensed(dist_matrix: np.ndarray, tries: int, heuristic: bool) -> float:
     """
     Compute the delta hyperbolicity using a condensed algorithm.
 
@@ -148,7 +151,7 @@ def delta_condensed(dist_matrix, tries, heuristic):
     The result is then normalized by the diameter to obtain the final delta hyperbolicity value.
     """
     diam = np.max(dist_matrix)
-    if heuristic == True:
+    if heuristic:
         delta = calculate_delta_heuristic(dist_matrix)
     else:
         delta = calculate_delta_condensed(dist_matrix, tries)

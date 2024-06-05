@@ -31,7 +31,8 @@ def delta_CCL_cpu(dist_matrix: np.ndarray, l: float) -> float:
 
 def delta_CCL_gpu(
     dist_matrix: np.ndarray,
-    l: float,
+    l: float = 0.05,
+    far_away_pairs: list[tuple[int, int]] = None,
     threadsperblock: Tuple[int, int] = (32, 32),
 ) -> float:
     """
@@ -44,6 +45,9 @@ def delta_CCL_gpu(
 
     l : float
         A factor determining the number of far-away pairs to consider.
+
+    far_apart_pairs : List[Tuple[int, int]]
+        List of far apart pairs.
 
     threadsperblock : Tuple[int, int], optional
         A tuple specifying the number of threads per block to use in the GPU computation.
@@ -67,12 +71,13 @@ def delta_CCL_gpu(
     >>> l = {'threshold': 0.5}
     >>> delta, diam = CCL_gpu(dist_matrix, l)
     >>> print(delta)
-    0.6666666666666666, 2.0
+    0.6666666666666666
     """
     diam = np.max(dist_matrix)
     n = dist_matrix.shape[0]
 
-    far_away_pairs = get_far_away_pairs(dist_matrix, int((n * (n + 1) / 2) * l))
+    if isinstance(far_away_pairs, list):
+        far_away_pairs = get_far_away_pairs(dist_matrix, int((n * (n + 1) / 2) * l))
     (
         n,
         x_coord_pairs,

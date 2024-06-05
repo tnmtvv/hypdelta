@@ -1,5 +1,5 @@
 # hypdelta
-# ![Logo](https://i.imgur.com/3RALASK.png)
+# ![Logo](https://imgur.com/a/dAKzz7O)
 
 ![example workflow](https://github.com/tnmtvv/hypdelta/actions/workflows/tests.yml/badge.svg)
 
