@@ -8,10 +8,11 @@ from hypdelta.calculus_utils import (
     calc_max_lines,
 )
 from hypdelta.cudaprep import cuda_prep_cartesian
+from typing import List, Tuple, Optional
 
 
 @cuda.jit
-def gpu_cartesian(dist_array, delta_res):
+def gpu_cartesian(dist_array: np.ndarray, delta_res: np.ndarray) -> None:
     """
     Computes the delta hyperbolicity for a given array of distance values using Cartesian coordinates.
 
@@ -36,7 +37,6 @@ def gpu_cartesian(dist_array, delta_res):
       (d(A,B) + d(C,D) - max(d(A,C) + d(B,D), d(A,D) + d(B,C))) / 2
     - This function should be launched as a CUDA kernel with an appropriate number of threads and blocks.
     """
-
     row = cuda.grid(1)
     cuda.atomic.max(
         delta_res,
@@ -53,7 +53,13 @@ def gpu_cartesian(dist_array, delta_res):
     )
 
 
-def delta_cartesian(dist_matrix, l, all_threads, mem_gpu_bound):
+def delta_cartesian(
+    dist_matrix: np.ndarray,
+    far_away_pairs: Optional[List[Tuple[int, int]]] = None,
+    l: float = 0.05,
+    all_threads: int = 1024,
+    mem_gpu_bound: int = 16,
+) -> float:
     """
     Computes the delta hyperbolicity of a given distance matrix using a Cartesian approach.
 
@@ -64,38 +70,46 @@ def delta_cartesian(dist_matrix, l, all_threads, mem_gpu_bound):
     -----------
     dist_matrix : np.ndarray
         A 2D array representing the distance matrix.
-    l : int
+
+    far_away_pairs : Optional[List[Tuple[int, int]]]
+        List of far apart pairs.
+
+    l : float
         A parameter to determine the fraction of far away pairs to consider.
+
     all_threads : int
         The number of threads to use for GPU computation.
+
     mem_gpu_bound: int
-        Max available gpu memory in Gb.
+        Max available GPU memory in GB.
 
     Returns:
     --------
-    delta : float
+    float
         The maximum delta hyperbolicity value computed.
 
     Notes:
     ------
+    - Either l or far_away_pairs should be given. If far_away_pairs is None, the list of far away pairs will be calculated in place with the l parameter.
     - The function assumes that CUDA and the necessary GPU setup are available and correctly configured.
     - The distance matrix should be a square matrix representing the pairwise distances between points.
     """
     n = dist_matrix.shape[0]
     diam = np.max(dist_matrix)
 
-    far_away_pairs = get_far_away_pairs(dist_matrix, int((n * (n + 1) / 2) * l))
+    if far_away_pairs is None:
+        far_away_pairs = get_far_away_pairs(dist_matrix, int((n * (n + 1) / 2) * l))
     len_far_away = len(far_away_pairs)
 
     batch_size = calc_max_lines(mem_gpu_bound, len_far_away)
 
     cartesian_size = int(len_far_away * (len_far_away - 1) / 2)
-    batch_N = max(1, np.ceil(cartesian_size // batch_size))
+    batch_N = max(1, cartesian_size // batch_size + 1)
 
     deltas = np.empty(batch_N)
 
     for i in range(batch_N):
-        (indices) = prepare_batch_indices_flat(
+        indices = prepare_batch_indices_flat(
             far_away_pairs,
             i * batch_size,
             min((i + 1) * batch_size, cartesian_size),
@@ -114,4 +128,4 @@ def delta_cartesian(dist_matrix, l, all_threads, mem_gpu_bound):
         del cartesian_dist_array
         del batch
     delta = max(deltas)
-    return 2 * delta_res[0] / diam
+    return 2 * delta / diam

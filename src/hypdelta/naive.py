@@ -95,9 +95,10 @@ def delta_naive_gpu(
         Сontaining the delta.
     """
     diam = np.max(dist_matrix)
-    adj_m, k, delta_res, threadsperblock, blockspergrid = cuda_prep_naive(
+    # adj_m, k, diff_num_arr, delta_res, threadsperblock, blockspergrid
+    adj_m, k, diff_num_arr, delta_res, threadsperblock, blockspergrid = cuda_prep_naive(
         dist_matrix, threadsperblock
     )
-    true_delta_gpu[blockspergrid, threadsperblock](adj_m, delta_res, k)
+    true_delta_gpu[blockspergrid, threadsperblock](adj_m, delta_res, k, diff_num_arr)
     delta = delta_res[0]
     return 2 * delta / diam

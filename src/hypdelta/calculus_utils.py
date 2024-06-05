@@ -1,29 +1,37 @@
+from typing import Tuple
 import numpy as np
 import math
 from numba import njit, prange
 
 
-@njit()
-def indx_to_2d(indx):
+@njit(fastmath=True)
+def indx_to_2d(k: int) -> Tuple[int, int]:
     """
-    Converts a linear index to a 2D index of a cartesian product.
+    Converts a 1D index to a 2D index following a specific pattern.
 
     Parameters:
     -----------
-    indx : int
-        The linear index to be converted.
+    k : int
+        The 1D index to be converted.
 
     Returns:
     --------
-    tuple
-        A tuple (n, k) representing the 2D index.
+    Tuple[int, int]
+        The corresponding 2D index (n, m).
     """
-    n = round(math.sqrt(2 * indx))
-    S_n = (1 + n) / 2 * n
-    return n, int(n - (S_n - indx) - 1)
+    # Find n using the quadratic formula component
+    n = math.floor((1 + math.sqrt(1 + 8 * k)) / 2)
+
+    # Calculate the corresponding triangular number T_{n-1}
+    T_n_minus_1 = (n * (n - 1)) // 2
+
+    # Calculate m
+    m = k - T_n_minus_1
+
+    return (n, m)
 
 
-def calc_max_lines(gpu_mem_bound, pairs_len):
+def calc_max_lines(gpu_mem_bound: float, pairs_len: int) -> int:
     """
     Calculates the maximum number of lines that can be processed based on GPU memory constraints.
 
@@ -50,12 +58,12 @@ def calc_max_lines(gpu_mem_bound, pairs_len):
     parts = (cartesian_size * 6 * 8) / (gpu_mem_bound * math.pow(10, 9))
     print(cartesian_size)
     print(parts)
-    max_lines = int(cartesian_size // parts)
+    max_lines = int(np.ceil(cartesian_size / parts))
     return max_lines
 
 
 @njit(parallel=True)
-def batch_flatten(indices, dist_matrix_flat):
+def batch_flatten(indices: np.ndarray, dist_matrix_flat: np.ndarray) -> np.ndarray:
     """
     Extracts and returns a batch of values from a flattened distance matrix
     based on the provided indices, using parallel computation for efficiency.
@@ -82,7 +90,9 @@ def batch_flatten(indices, dist_matrix_flat):
 
 
 @njit(parallel=True)
-def prepare_batch_indices_flat(far_away_pairs, start_ind, end_ind, n):
+def prepare_batch_indices_flat(
+    far_away_pairs: list, start_ind: int, end_ind: int, n: int
+) -> np.ndarray:
     """
     Prepares a flattened array of batch indices for Cartesian products.
 
@@ -119,7 +129,7 @@ def prepare_batch_indices_flat(far_away_pairs, start_ind, end_ind, n):
     return batch_indices
 
 
-def get_far_away_pairs(A: np.ndarray, N: int):
+def get_far_away_pairs(A: np.ndarray, N: int) -> list:
     """
     Identifies pairs of points that are far away in the distance matrix.
 
@@ -145,7 +155,9 @@ def get_far_away_pairs(A: np.ndarray, N: int):
 
 
 @njit()
-def s_delta(dist, ind_i, ind_j, k, delta_hyp_k):
+def s_delta(
+    dist: np.ndarray, ind_i: int, ind_j: int, k: int, delta_hyp_k: float
+) -> float:
     """
     Calculate the delta hyperbolicity for a given set of distances.
 
