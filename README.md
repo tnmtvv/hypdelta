@@ -1,6 +1,6 @@
 # hypdelta
 
-<img align="left" width="110" height="110" src="delta_logo.png">
+<img align="left" width="110" height="110" src="logo.png">
 
 
 ![example workflow](https://github.com/tnmtvv/hypdelta/actions/workflows/tests.yml/badge.svg)
