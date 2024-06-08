@@ -87,21 +87,32 @@ def hypdelta(
     """
     if strategy == "naive":
         if device == "cpu":
-            delta = delta_naive_cpu(distance_matrix)
+            delta = delta_naive_cpu(dist_matrix=distance_matrix)
         elif device == "gpu":
-            delta = delta_naive_gpu(distance_matrix, threadsperblock)
+            delta = delta_naive_gpu(
+                dist_matrix=distance_matrix, threadsperblock=threadsperblock
+            )
     elif strategy == "condensed":
         if device == "cpu":
-            delta = delta_condensed(distance_matrix, tries, heuristic)
+            delta = delta_condensed(
+                dist_matrix=distance_matrix, tries=tries, heuristic=heuristic
+            )
         elif device == "gpu":
             raise GPUNotImplemented(
                 "The 'condensed' strategy is not implemented for GPU."
             )
     elif strategy == "CCL":
         if device == "cpu":
-            delta = delta_CCL_cpu(distance_matrix, l)
+            delta = delta_CCL_cpu(dist_matrix=distance_matrix, l=l)
         elif device == "gpu":
-            delta = delta_CCL_gpu(distance_matrix, l, threadsperblock)
+            delta = delta_CCL_gpu(
+                dist_matrix=distance_matrix, l=l, threadsperblock=threadsperblock
+            )
     elif strategy == "cartesian":
-        delta = delta_cartesian(distance_matrix, l, max_threads, max_gpu_mem)
+        delta = delta_cartesian(
+            dist_matrix=distance_matrix,
+            l=l,
+            max_threads=max_threads,
+            max_gpu_mem=max_gpu_mem,
+        )
     return delta

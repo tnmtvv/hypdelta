@@ -27,7 +27,7 @@ Here's a basic example to get you started with `hypdelta`:
 
 ```python
 import numpy as np
-from hypdelta import hypdelta
+from hypdelta.delta import hypdelta
 
 # Generate a synthetic distance matrix
 def generate_synthetic_points(dimensions, num_points):

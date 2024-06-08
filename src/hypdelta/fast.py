@@ -76,7 +76,7 @@ def delta_CCL_gpu(
     diam = np.max(dist_matrix)
     n = dist_matrix.shape[0]
 
-    if isinstance(far_away_pairs, list):
+    if far_away_pairs is None:
         far_away_pairs = get_far_away_pairs(dist_matrix, int((n * (n + 1) / 2) * l))
     (
         n,
