@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hypdelta"
-version = "0.1.1"
+version = "0.1.47"
 description = "A Python library for calculating delta hyperbolicity."
 authors = ["Maveeva Tatyana <tpmatveeva@hse.ru>"]
 readme = "README.md"
@@ -20,5 +20,5 @@ numpy = "=1.24.4"
 numba = "=0.57.1"
 scipy = "=1.4.0"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools]
+package-dir = {"" = "src"}
